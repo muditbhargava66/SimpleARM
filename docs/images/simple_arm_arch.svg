@@ -1,0 +1,86 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 640">
+    <!-- Background -->
+    <rect width="1280" height="640" fill="#f8f9fa"/>
+    
+    <!-- Title -->
+    <text x="640" y="60" font-family="Arial" font-size="36" fill="#2c3e50" text-anchor="middle" font-weight="bold">
+        SimpleARM Architecture
+    </text>
+    <text x="640" y="90" font-family="Arial" font-size="18" fill="#7f8c8d" text-anchor="middle">
+        3-Stage Pipeline ARM Cortex-M0 Compatible Core
+    </text>
+
+    <!-- Main Pipeline Box -->
+    <rect x="200" y="140" width="880" height="360" rx="10" fill="#ffffff" stroke="#2c3e50" stroke-width="2"/>
+
+    <!-- Pipeline Stages -->
+    <!-- Fetch Stage -->
+    <rect x="240" y="180" width="240" height="280" rx="5" fill="#3498db" fill-opacity="0.1" stroke="#3498db" stroke-width="2"/>
+    <text x="360" y="210" font-family="Arial" font-size="20" fill="#2c3e50" text-anchor="middle" font-weight="bold">Fetch Stage</text>
+    
+    <!-- Components in Fetch -->
+    <rect x="260" y="230" width="200" height="50" rx="5" fill="#ffffff" stroke="#3498db" stroke-width="1"/>
+    <text x="360" y="260" font-family="Arial" font-size="14" fill="#2c3e50" text-anchor="middle">Program Counter</text>
+    
+    <rect x="260" y="290" width="200" height="50" rx="5" fill="#ffffff" stroke="#3498db" stroke-width="1"/>
+    <text x="360" y="320" font-family="Arial" font-size="14" fill="#2c3e50" text-anchor="middle">Instruction Cache</text>
+    
+    <rect x="260" y="350" width="200" height="50" rx="5" fill="#ffffff" stroke="#3498db" stroke-width="1"/>
+    <text x="360" y="380" font-family="Arial" font-size="14" fill="#2c3e50" text-anchor="middle">Branch Prediction</text>
+
+    <!-- Decode Stage -->
+    <rect x="520" y="180" width="240" height="280" rx="5" fill="#e74c3c" fill-opacity="0.1" stroke="#e74c3c" stroke-width="2"/>
+    <text x="640" y="210" font-family="Arial" font-size="20" fill="#2c3e50" text-anchor="middle" font-weight="bold">Decode Stage</text>
+    
+    <!-- Components in Decode -->
+    <rect x="540" y="230" width="200" height="50" rx="5" fill="#ffffff" stroke="#e74c3c" stroke-width="1"/>
+    <text x="640" y="260" font-family="Arial" font-size="14" fill="#2c3e50" text-anchor="middle">Instruction Decoder</text>
+    
+    <rect x="540" y="290" width="200" height="50" rx="5" fill="#ffffff" stroke="#e74c3c" stroke-width="1"/>
+    <text x="640" y="320" font-family="Arial" font-size="14" fill="#2c3e50" text-anchor="middle">Register File</text>
+    
+    <rect x="540" y="350" width="200" height="50" rx="5" fill="#ffffff" stroke="#e74c3c" stroke-width="1"/>
+    <text x="640" y="380" font-family="Arial" font-size="14" fill="#2c3e50" text-anchor="middle">Immediate Generator</text>
+
+    <!-- Execute Stage -->
+    <rect x="800" y="180" width="240" height="280" rx="5" fill="#2ecc71" fill-opacity="0.1" stroke="#2ecc71" stroke-width="2"/>
+    <text x="920" y="210" font-family="Arial" font-size="20" fill="#2c3e50" text-anchor="middle" font-weight="bold">Execute Stage</text>
+    
+    <!-- Components in Execute -->
+    <rect x="820" y="230" width="200" height="50" rx="5" fill="#ffffff" stroke="#2ecc71" stroke-width="1"/>
+    <text x="920" y="260" font-family="Arial" font-size="14" fill="#2c3e50" text-anchor="middle">ALU</text>
+    
+    <rect x="820" y="290" width="200" height="50" rx="5" fill="#ffffff" stroke="#2ecc71" stroke-width="1"/>
+    <text x="920" y="320" font-family="Arial" font-size="14" fill="#2c3e50" text-anchor="middle">Memory Interface</text>
+    
+    <rect x="820" y="350" width="200" height="50" rx="5" fill="#ffffff" stroke="#2ecc71" stroke-width="1"/>
+    <text x="920" y="380" font-family="Arial" font-size="14" fill="#2c3e50" text-anchor="middle">Branch Resolution</text>
+
+    <!-- Memory System -->
+    <rect x="240" y="520" width="360" height="80" rx="5" fill="#9b59b6" fill-opacity="0.1" stroke="#9b59b6" stroke-width="2"/>
+    <text x="420" y="560" font-family="Arial" font-size="16" fill="#2c3e50" text-anchor="middle" font-weight="bold">
+        Memory System (8KB OpenRAM SRAM)
+    </text>
+
+    <!-- Debug Interface -->
+    <rect x="680" y="520" width="360" height="80" rx="5" fill="#f1c40f" fill-opacity="0.1" stroke="#f1c40f" stroke-width="2"/>
+    <text x="860" y="560" font-family="Arial" font-size="16" fill="#2c3e50" text-anchor="middle" font-weight="bold">
+        JTAG Debug Interface
+    </text>
+
+    <!-- Data Flow Arrows -->
+    <defs>
+        <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+            <polygon points="0 0, 10 3.5, 0 7" fill="#95a5a6"/>
+        </marker>
+    </defs>
+    
+    <!-- Pipeline Stage Arrows -->
+    <line x1="480" y1="320" x2="520" y2="320" stroke="#95a5a6" stroke-width="2" marker-end="url(#arrowhead)"/>
+    <line x1="760" y1="320" x2="800" y2="320" stroke="#95a5a6" stroke-width="2" marker-end="url(#arrowhead)"/>
+    
+    <!-- Memory and Debug Connections -->
+    <path d="M 420 480 L 420 520" stroke="#95a5a6" stroke-width="2" marker-end="url(#arrowhead)" fill="none"/>
+    <path d="M 860 480 L 860 520" stroke="#95a5a6" stroke-width="2" marker-end="url(#arrowhead)" fill="none"/>
+
+</svg>

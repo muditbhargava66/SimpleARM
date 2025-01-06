@@ -1,0 +1,88 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 640">
+    <!-- Background with subtle gradient -->
+    <defs>
+        <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" style="stop-color:#1a1a2e;stop-opacity:1" />
+            <stop offset="100%" style="stop-color:#16213e;stop-opacity:1" />
+        </linearGradient>
+        
+        <!-- Glow effect -->
+        <filter id="glow">
+            <feGaussianBlur stdDeviation="5" result="coloredBlur"/>
+            <feMerge>
+                <feMergeNode in="coloredBlur"/>
+                <feMergeNode in="SourceGraphic"/>
+            </feMerge>
+        </filter>
+
+        <!-- Circuit pattern -->
+        <pattern id="circuitPattern" x="0" y="0" width="50" height="50" patternUnits="userSpaceOnUse">
+            <path d="M 25 0 L 25 50 M 0 25 L 50 25" stroke="#ffffff" stroke-width="0.5" stroke-opacity="0.1"/>
+            <circle cx="25" cy="25" r="2" fill="#ffffff" fill-opacity="0.1"/>
+        </pattern>
+    </defs>
+
+    <!-- Main background -->
+    <rect width="1280" height="640" fill="url(#bgGradient)"/>
+    
+    <!-- Circuit pattern overlay -->
+    <rect width="1280" height="640" fill="url(#circuitPattern)"/>
+
+    <!-- Main processor symbol group -->
+    <g transform="translate(440, 120)" filter="url(#glow)">
+        <!-- Outer processor frame -->
+        <rect x="0" y="0" width="400" height="400" rx="40" 
+              fill="#0084ff" fill-opacity="0.1" 
+              stroke="#0084ff" stroke-width="4"/>
+
+        <!-- Inner components -->
+        <!-- Pipeline stages representation -->
+        <rect x="50" y="80" width="300" height="80" rx="10" 
+              fill="#0084ff" fill-opacity="0.2" 
+              stroke="#0084ff" stroke-width="2"/>
+        <rect x="50" y="180" width="300" height="80" rx="10" 
+              fill="#0084ff" fill-opacity="0.3" 
+              stroke="#0084ff" stroke-width="2"/>
+        <rect x="50" y="280" width="300" height="80" rx="10" 
+              fill="#0084ff" fill-opacity="0.4" 
+              stroke="#0084ff" stroke-width="2"/>
+
+        <!-- Data flow lines -->
+        <path d="M 200 160 L 200 180 M 200 260 L 200 280" 
+              stroke="#0084ff" stroke-width="3" stroke-linecap="round"/>
+    </g>
+
+    <!-- SimpleARM text -->
+    <text x="640" y="580" font-family="Arial" font-size="48" font-weight="bold" 
+          fill="#ffffff" text-anchor="middle" filter="url(#glow)">
+        SimpleARM
+    </text>
+
+    <!-- Tagline -->
+    <text x="640" y="615" font-family="Arial" font-size="24" 
+          fill="#0084ff" text-anchor="middle">
+        Open-Source ARM Cortex-M0 Core
+    </text>
+
+    <!-- Corner decorative elements -->
+    <g stroke="#0084ff" stroke-width="2" stroke-opacity="0.5">
+        <path d="M 40,40 L 80,40 L 80,80" fill="none"/>
+        <path d="M 1200,40 L 1240,40 L 1240,80" fill="none"/>
+        <path d="M 40,560 L 80,560 L 80,600" fill="none"/>
+        <path d="M 1200,560 L 1240,560 L 1240,600" fill="none"/>
+    </g>
+
+    <!-- Top-right feature indicators -->
+    <g transform="translate(1000, 50)">
+        <circle cx="0" cy="0" r="8" fill="#00ff00" fill-opacity="0.5"/>
+        <circle cx="30" cy="0" r="8" fill="#ffff00" fill-opacity="0.5"/>
+        <circle cx="60" cy="0" r="8" fill="#ff0000" fill-opacity="0.5"/>
+    </g>
+
+    <!-- Bottom details -->
+    <g transform="translate(40, 540)" font-family="Arial" font-size="14" fill="#ffffff" fill-opacity="0.5">
+        <text x="0" y="0">Sky130 PDK</text>
+        <text x="120" y="0">100MHz</text>
+        <text x="220" y="0">8KB SRAM</text>
+    </g>
+</svg>
