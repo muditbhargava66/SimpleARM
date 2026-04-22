@@ -85,6 +85,7 @@ sram_output/
 *.cdl
 *.spef
 *.spi
+*.cif
 *.drc
 *.lvs
 *.antenna
@@ -217,16 +218,22 @@ scratch/
 .hg/
 CVS/
 
-# Editor and IDE specific files
-*.sublime-workspace
-*.sublime-project
-.settings/
-.project
-.cproject
-.classpath
-.metals/
-.bloop/
-*.iml
+# TinyTapeout and setup
+ttsetup/
+test/sim_build/
+test/results.xml
+test/tb.vcd
+simple_arm_trace.vcd
+sim_verilator/
+synthesis_result.json
+simple_arm_sky130.v
+simple_arm_sky130.json
+simple_arm_top.sby
+simple_arm_top/
+*.png
+*.svg
+!docs/images/*.svg
+!docs/images/*.png
 
 # Build system specific
 cmake-build-*/

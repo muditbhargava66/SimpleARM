@@ -14,12 +14,10 @@ module decode_unit (
     input  wire        valid_in,      // Instruction valid signal
     input  wire [31:0] pc_in,        // Program counter from fetch stage
     
-    // Register file interface
-    output reg  [3:0]  rs1_addr,     // Source register 1 address
-    output reg  [3:0]  rs2_addr,     // Source register 2 address
-    output reg  [3:0]  rd_addr,      // Destination register address
-    input  wire [31:0] rs1_data,     // Source register 1 data
-    input  wire [31:0] rs2_data,     // Source register 2 data
+    // Register file interface (address outputs)
+    output wire [3:0]  rs1_addr,     // Source register 1 address
+    output wire [3:0]  rs2_addr,     // Source register 2 address
+    output wire [3:0]  rd_addr,      // Destination register address
     
     // Control signals to execute stage
     output reg  [3:0]  alu_op,       // ALU operation
@@ -43,39 +41,28 @@ module decode_unit (
     wire [4:0]  rs1    = instr_in[19:15];
     wire [4:0]  rs2    = instr_in[24:20];
 
-    // Immediate value generation
-    reg [31:0] i_imm; // I-type immediate
-    reg [31:0] s_imm; // S-type immediate
-    reg [31:0] b_imm; // B-type immediate
-    reg [31:0] u_imm; // U-type immediate
-    reg [31:0] j_imm; // J-type immediate
+    // Register address outputs (directly from instruction)
+    assign rs1_addr = rs1[3:0];
+    assign rs2_addr = rs2[3:0];
+    assign rd_addr  = rd[3:0];
 
-    // Immediate value generation logic
-    always @(*) begin
-        // I-type immediate
-        i_imm = {{20{instr_in[31]}}, instr_in[31:20]};
-        
-        // S-type immediate
-        s_imm = {{20{instr_in[31]}}, instr_in[31:25], instr_in[11:7]};
-        
-        // B-type immediate
-        b_imm = {{20{instr_in[31]}}, instr_in[7], instr_in[30:25], 
-                 instr_in[11:8], 1'b0};
-        
-        // U-type immediate
-        u_imm = {instr_in[31:12], 12'b0};
-        
-        // J-type immediate
-        j_imm = {{12{instr_in[31]}}, instr_in[19:12], instr_in[20], 
-                 instr_in[30:21], 1'b0};
-    end
+    // Immediate value generation
+    wire [31:0] i_imm; // I-type immediate
+    wire [31:0] s_imm; // S-type immediate
+    wire [31:0] b_imm; // B-type immediate
+    wire [31:0] u_imm; // U-type immediate
+    wire [31:0] j_imm; // J-type immediate
+
+    // Immediate value generation (continuous assignments)
+    assign i_imm = {{20{instr_in[31]}}, instr_in[31:20]};
+    assign s_imm = {{20{instr_in[31]}}, instr_in[31:25], instr_in[11:7]};
+    assign b_imm = {{20{instr_in[31]}}, instr_in[7], instr_in[30:25], instr_in[11:8], 1'b0};
+    assign u_imm = {instr_in[31:12], 12'b0};
+    assign j_imm = {{12{instr_in[31]}}, instr_in[19:12], instr_in[20], instr_in[30:21], 1'b0};
 
     // Main decode logic
     always @(*) begin
         // Default values
-        rs1_addr = rs1[3:0];
-        rs2_addr = rs2[3:0];
-        rd_addr  = rd[3:0];
         alu_op   = 4'b0000;
         imm_val  = 32'h0;
         use_imm  = 1'b0;
@@ -96,6 +83,7 @@ module decode_unit (
                         3'b101: alu_op = (funct7[5]) ? 4'b0111 : 4'b0110; // SRL/SRA
                         3'b110: alu_op = 4'b1000; // OR
                         3'b111: alu_op = 4'b1001; // AND
+                        default: alu_op = 4'b0000;
                     endcase
                     reg_write = 1'b1;
                 end
@@ -111,14 +99,73 @@ module decode_unit (
                         3'b100: alu_op = 4'b0101; // XORI
                         3'b110: alu_op = 4'b1000; // ORI
                         3'b111: alu_op = 4'b1001; // ANDI
+                        3'b001: alu_op = 4'b0010; // SLLI
+                        3'b101: alu_op = (funct7[5]) ? 4'b0111 : 4'b0110; // SRLI/SRAI
+                        default: alu_op = 4'b0000;
                     endcase
                 end
 
-                // Additional instruction decoding will be implemented here
-                // Including load/store, branches, and jumps
-                
+                7'b0000011: begin // Load instructions
+                    use_imm = 1'b1;
+                    imm_val = i_imm;
+                    mem_read = 1'b1;
+                    reg_write = 1'b1;
+                    alu_op = 4'b0000; // ADD for address calculation
+                end
+
+                7'b0100011: begin // Store instructions
+                    use_imm = 1'b1;
+                    imm_val = s_imm;
+                    mem_write = 1'b1;
+                    alu_op = 4'b0000; // ADD for address calculation
+                end
+
+                7'b1100011: begin // Branch instructions
+                    branch_op = 1'b1;
+                    imm_val = b_imm;
+                    case (funct3)
+                        3'b000: alu_op = 4'b0000; // BEQ
+                        3'b001: alu_op = 4'b0001; // BNE
+                        3'b100: alu_op = 4'b0100; // BLT
+                        3'b101: alu_op = 4'b0101; // BGE
+                        3'b110: alu_op = 4'b0110; // BLTU
+                        3'b111: alu_op = 4'b0111; // BGEU
+                        default: alu_op = 4'b0000;
+                    endcase
+                end
+
+                7'b0110111: begin // LUI
+                    use_imm = 1'b1;
+                    imm_val = u_imm;
+                    reg_write = 1'b1;
+                    alu_op = 4'b1010; // Pass imm through
+                end
+
+                7'b0010111: begin // AUIPC
+                    use_imm = 1'b1;
+                    imm_val = u_imm;
+                    reg_write = 1'b1;
+                    alu_op = 4'b1011; // PC + imm
+                end
+
+                7'b1101111: begin // JAL
+                    use_imm = 1'b1;
+                    imm_val = j_imm;
+                    branch_op = 1'b1;
+                    reg_write = 1'b1;
+                    alu_op = 4'b1100; // JAL operation
+                end
+
+                7'b1100111: begin // JALR
+                    use_imm = 1'b1;
+                    imm_val = i_imm;
+                    branch_op = 1'b1;
+                    reg_write = 1'b1;
+                    alu_op = 4'b1101; // JALR operation
+                end
+
                 default: begin
-                    // Invalid instruction handling
+                    // Invalid instruction or NOP
                     alu_op = 4'b0000;
                     reg_write = 1'b0;
                 end

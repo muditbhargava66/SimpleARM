@@ -1,7 +1,8 @@
 // -----------------------------------------------------------------------------
 // File: sram_wrapper.v
 // Project: SimpleARM - A Simplified ARM Cortex-M0 Processor Core
-// Purpose: Wrapper for OpenRAM-generated SRAM
+// Purpose: Synthesizable memory wrapper (for P&R flow testing)
+// Note: This version uses registers instead of SRAM macro for synthesis flow
 // -----------------------------------------------------------------------------
 
 module sram_wrapper (
@@ -22,38 +23,47 @@ module sram_wrapper (
     output reg         ready          // Data ready signal
 );
 
-    // Internal signals
-    reg [31:0] ram_wdata;
-    reg [31:0] ram_rdata;
-    reg        ram_cs;
-    reg        ram_we;
-    reg [3:0]  ram_byte_en;
-
-    // OpenRAM instance (8KB SRAM)
-    // Note: This assumes the OpenRAM generator created a memory with these ports
-    sky130_sram_8kx32_word openram_8kb (
-        .clk0     (clk),
-        .csb0     (~ram_cs),          // Active high in OpenRAM
-        .web0     (~ram_we),          // Active high in OpenRAM
-        .wmask0   (~ram_byte_en),     // Active high in OpenRAM
-        .addr0    (addr),
-        .din0     (ram_wdata),
-        .dout0    (ram_rdata)
-    );
-
+    // Internal signals for active-high conversion
+    wire ram_cs;
+    wire ram_we;
+    wire [3:0] ram_byte_en;
+    
     // Convert active low to active high signals
-    always @(*) begin
-        ram_cs = ~cs_n;
-        ram_we = ~we_n;
-        ram_byte_en = ~byte_en_n;
-        ram_wdata = wdata;
+    assign ram_cs = ~cs_n;
+    assign ram_we = ~we_n;
+    assign ram_byte_en = ~byte_en_n;
+
+    // Synthesizable memory (256 words x 32 bits = 1KB for synthesis testing)
+    // Note: Reduced size for synthesis flow - full 8KB would be too large
+    localparam MEM_DEPTH = 256;  // 1KB
+    localparam ADDR_WIDTH = 8;   // log2(256)
+    
+    reg [31:0] mem [0:MEM_DEPTH-1];
+    reg [31:0] rdata_reg;
+    
+    // Truncate address for smaller memory
+    wire [ADDR_WIDTH-1:0] mem_addr = addr[ADDR_WIDTH-1:0];
+    
+    // Assign read data output
+    assign rdata = rdata_reg;
+    
+    // Memory read/write logic
+    always @(posedge clk) begin
+        if (ram_cs) begin
+            if (ram_we) begin
+                // Write operation with byte mask
+                if (ram_byte_en[0]) mem[mem_addr][7:0]   <= wdata[7:0];
+                if (ram_byte_en[1]) mem[mem_addr][15:8]  <= wdata[15:8];
+                if (ram_byte_en[2]) mem[mem_addr][23:16] <= wdata[23:16];
+                if (ram_byte_en[3]) mem[mem_addr][31:24] <= wdata[31:24];
+            end
+            // Read operation (read-first behavior)
+            rdata_reg <= mem[mem_addr];
+        end
     end
 
-    // Assign read data output
-    assign rdata = ram_rdata;
-
     // Ready signal generation
-    // OpenRAM has 1 cycle latency for reads
+    // 1 cycle latency for reads
     reg [1:0] ready_counter;
     
     always @(posedge clk or negedge rst_n) begin
@@ -88,18 +98,5 @@ module sram_wrapper (
             end
         end
     end
-
-    // Error Detection Logic
-    // synthesis translate_off
-    always @(posedge clk) begin
-        if (ram_cs && ram_we) begin
-            // Check for write to invalid address
-            if (addr >= 13'h2000) begin
-                $display("Error: Write to invalid address 0x%h", addr);
-                $stop;
-            end
-        end
-    end
-    // synthesis translate_on
 
 endmodule

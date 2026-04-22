@@ -5,7 +5,7 @@
 # -----------------------------------------------------------------------------
 
 # Operating conditions
-set_operating_conditions typical
+# (Removing typical as it caused STA error in OpenLane flow)
 
 # Clock definition
 create_clock -name clk -period 10 [get_ports clk]
@@ -20,14 +20,14 @@ set_clock_transition 0.12 [get_clocks clk]
 set_clock_transition 0.15 [get_clocks tck]
 
 # Input delays
-set_input_delay -clock clk -max 2.0 [remove_from_collection [all_inputs] [get_ports {clk tck}]]
-set_input_delay -clock clk -min 0.2 [remove_from_collection [all_inputs] [get_ports {clk tck}]]
+set_input_delay -clock clk -max 2.0 [get_ports {rst_n tms tdi trst_n sram_rdata[*]}]
+set_input_delay -clock clk -min 0.2 [get_ports {rst_n tms tdi trst_n sram_rdata[*]}]
 set_input_delay -clock tck -max 5.0 [get_ports {tms tdi trst_n}]
 set_input_delay -clock tck -min 0.5 [get_ports {tms tdi trst_n}]
 
 # Output delays
-set_output_delay -clock clk -max 2.0 [remove_from_collection [all_outputs] [get_ports tdo]]
-set_output_delay -clock clk -min 0.2 [remove_from_collection [all_outputs] [get_ports tdo]]
+set_output_delay -clock clk -max 2.0 [get_ports {uo_out[*] uio_out[*] uio_oe[*] sram_addr[*] sram_wdata[*] sram_cs_n sram_we_n sram_be_n[*]}]
+set_output_delay -clock clk -min 0.2 [get_ports {uo_out[*] uio_out[*] uio_oe[*] sram_addr[*] sram_wdata[*] sram_cs_n sram_we_n sram_be_n[*]}]
 set_output_delay -clock tck -max 5.0 [get_ports tdo]
 set_output_delay -clock tck -min 0.5 [get_ports tdo]
 

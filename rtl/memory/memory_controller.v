@@ -156,7 +156,7 @@ module memory_controller (
     end
 
     // Error detection
-    // synthesis translate_off
+`ifndef SYNTHESIS
     always @(posedge clk) begin
         if (instr_req && !instr_addr_valid) begin
             $display("Error: Invalid instruction address 0x%h", instr_addr);
@@ -167,6 +167,6 @@ module memory_controller (
             $stop;
         end
     end
-    // synthesis translate_on
+`endif
 
 endmodule

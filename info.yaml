@@ -1,0 +1,48 @@
+---
+project:
+  title: "SimpleARM"
+  author: "Mudit Bhargava"
+  description: "A 3-stage pipeline ARM Cortex-M0 compatible processor core."
+  tiles: "8x2"
+  language: "Verilog"
+  clock_hz: 10000000
+  source_files:
+    - project.v
+    - ../rtl/top/simple_arm_top.v
+    - ../rtl/core/alu.v
+    - ../rtl/core/decode_unit.v
+    - ../rtl/core/execute_unit.v
+    - ../rtl/core/fetch_unit.v
+    - ../rtl/core/register_file.v
+    - ../rtl/memory/memory_controller.v
+    - ../rtl/memory/sram_wrapper.v
+    - ../rtl/debug/jtag_controller.v
+  top_module:  "tt_um_simple_arm"
+
+yaml_version: 6
+
+pinout:
+  ui[0]: "clk"
+  ui[1]: "rst_n"
+  ui[2]: "tck"
+  ui[3]: "tms"
+  ui[4]: "tdi"
+  ui[5]: "trst_n"
+  ui[6]: ""
+  ui[7]: ""
+  uo[0]: "tdo"
+  uo[1]: "ext_wr_en"
+  uo[2]: "ext_rd_en"
+  uo[3]: "ext_ready_out"
+  uo[4]: "halted"
+  uo[5]: ""
+  uo[6]: ""
+  uo[7]: ""
+  uio[0]: ""
+  uio[1]: ""
+  uio[2]: ""
+  uio[3]: ""
+  uio[4]: ""
+  uio[5]: ""
+  uio[6]: ""
+  uio[7]: ""

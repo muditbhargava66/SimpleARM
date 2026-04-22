@@ -67,31 +67,26 @@ module simple_arm_top (
     wire        dbg_mem_ready;
 
     // System reset generation
-    wire system_rst_n = rst_n & dbg_reset_n;
+    wire system_rst_n;
+    assign system_rst_n = rst_n & dbg_reset_n;
 
-    // CPU Core instantiation
-    // Fetch Unit
-    fetch_unit fetch_unit_inst (
-        .clk          (clk),
-        .rst_n        (system_rst_n),
-        .stall        (dbg_halt_req),
-        .branch_taken (/* from execute */),
-        .branch_target(/* from execute */),
-        .pc_out       (core_instr_addr),
-        .instr_in     (core_instr_data),
-        .instr_out    (/* to decode */),
-        .valid_out    (fetch_valid)
-    );
-
-    // Decode Unit
-    wire [31:0] decode_instr;
+    // Pipeline signals - Fetch to Decode
+    wire        fetch_valid;
+    wire [31:0] fetch_instr_out;
+    
+    // Execute signals (declared before use)
+    wire [31:0] execute_result;
+    wire [3:0]  execute_rd_addr;
+    wire        execute_reg_write;
+    wire        execute_branch_taken;
+    wire [31:0] execute_branch_target;
+    
+    // Decode Unit control outputs
     wire [31:0] decode_pc;
     wire        decode_valid;
     wire [3:0]  decode_rs1_addr;
     wire [3:0]  decode_rs2_addr;
     wire [3:0]  decode_rd_addr;
-    wire [31:0] decode_rs1_data;
-    wire [31:0] decode_rs2_data;
     wire [3:0]  decode_alu_op;
     wire [31:0] decode_imm_val;
     wire        decode_use_imm;
@@ -99,19 +94,36 @@ module simple_arm_top (
     wire        decode_mem_write;
     wire        decode_branch_op;
     wire        decode_reg_write;
+    
+    // Register file data outputs (directly connected to execute)
+    wire [31:0] regfile_rs1_data;
+    wire [31:0] regfile_rs2_data;
 
+    // CPU Core instantiation
+    // Fetch Unit
+    fetch_unit fetch_unit_inst (
+        .clk          (clk),
+        .rst_n        (system_rst_n),
+        .stall        (dbg_halt_req),
+        .branch_taken (execute_branch_taken),
+        .branch_target(execute_branch_target),
+        .pc_out       (core_instr_addr),
+        .instr_in     (core_instr_data),
+        .instr_out    (fetch_instr_out),
+        .valid_out    (fetch_valid)
+    );
+
+    // Decode Unit
     decode_unit decode_unit_inst (
         .clk          (clk),
         .rst_n        (system_rst_n),
         .stall        (dbg_halt_req),
-        .instr_in     (decode_instr),
+        .instr_in     (fetch_instr_out),
         .valid_in     (fetch_valid),
         .pc_in        (core_instr_addr),
         .rs1_addr     (decode_rs1_addr),
         .rs2_addr     (decode_rs2_addr),
         .rd_addr      (decode_rd_addr),
-        .rs1_data     (decode_rs1_data),
-        .rs2_data     (decode_rs2_data),
         .alu_op       (decode_alu_op),
         .imm_val      (decode_imm_val),
         .use_imm      (decode_use_imm),
@@ -129,20 +141,14 @@ module simple_arm_top (
         .rst_n        (system_rst_n),
         .rs1_addr     (decode_rs1_addr),
         .rs2_addr     (decode_rs2_addr),
-        .rs1_data     (decode_rs1_data),
-        .rs2_data     (decode_rs2_data),
+        .rs1_data     (regfile_rs1_data),
+        .rs2_data     (regfile_rs2_data),
         .wr_en        (execute_reg_write),
         .wr_addr      (execute_rd_addr),
         .wr_data      (execute_result)
     );
 
     // Execute Unit
-    wire [31:0] execute_result;
-    wire [3:0]  execute_rd_addr;
-    wire        execute_reg_write;
-    wire        execute_branch_taken;
-    wire [31:0] execute_branch_target;
-
     execute_unit execute_unit_inst (
         .clk          (clk),
         .rst_n        (system_rst_n),
@@ -150,8 +156,8 @@ module simple_arm_top (
         .pc_in        (decode_pc),
         .valid_in     (decode_valid),
         .alu_op       (decode_alu_op),
-        .rs1_data     (decode_rs1_data),
-        .rs2_data     (decode_rs2_data),
+        .rs1_data     (regfile_rs1_data),
+        .rs2_data     (regfile_rs2_data),
         .imm_val      (decode_imm_val),
         .use_imm      (decode_use_imm),
         .mem_read     (decode_mem_read),
@@ -234,7 +240,20 @@ module simple_arm_top (
         .dbg_mem_ready(dbg_mem_ready)
     );
 
-    // External Memory Interface (optional)
+    // Tie off unused debug signals
+    assign dbg_halted = 1'b0;
+    assign dbg_reg_rdata = 32'b0;
+    assign dbg_reg_ready = 1'b1;
+    assign dbg_mem_rdata = 32'b0;
+    assign dbg_mem_ready = 1'b1;
+    
+    // Instruction request is always active when not in reset
+    assign core_instr_req = system_rst_n;
+    
+    // Data byte enable - default to full word
+    assign core_data_be = 4'b1111;
+
+    // External Memory Interface
     assign ext_addr    = core_data_addr;
     assign ext_wdata   = core_data_wdata;
     assign ext_wr_en   = core_data_we;

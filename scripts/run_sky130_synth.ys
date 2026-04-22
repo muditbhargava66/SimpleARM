@@ -1,0 +1,45 @@
+# -----------------------------------------------------------------------------
+# File: run_sky130_synth.ys
+# Project: SimpleARM - A Simplified ARM Cortex-M0 Processor Core
+# Purpose: Yosys synthesis targeting SKY130 PDK
+# Usage: cd /home/mudit/Projects/SimpleARM && yosys scripts/run_sky130_synth.ys
+# -----------------------------------------------------------------------------
+
+# Read RTL files
+read_verilog rtl/core/alu.v
+read_verilog rtl/core/fetch_unit.v
+read_verilog rtl/core/decode_unit.v
+read_verilog rtl/core/execute_unit.v
+read_verilog rtl/core/register_file.v
+read_verilog rtl/memory/memory_controller.v
+read_verilog scripts/sram_blackbox.v
+read_verilog rtl/memory/sram_wrapper.v
+read_verilog rtl/debug/jtag_controller.v
+read_verilog rtl/top/simple_arm_top.v
+
+# Set top module
+hierarchy -check -top simple_arm_top
+
+# Coarse-grain synthesis
+synth -top simple_arm_top
+
+# Read Liberty file for mapping
+read_liberty -lib /home/mudit/.volare/sky130A/libs.ref/sky130_fd_sc_hd/lib/sky130_fd_sc_hd__tt_025C_1v80.lib
+
+# Map D flip-flops to library cells
+dfflibmap -liberty /home/mudit/.volare/sky130A/libs.ref/sky130_fd_sc_hd/lib/sky130_fd_sc_hd__tt_025C_1v80.lib
+
+# Map combinational logic to library cells using ABC
+abc -liberty /home/mudit/.volare/sky130A/libs.ref/sky130_fd_sc_hd/lib/sky130_fd_sc_hd__tt_025C_1v80.lib
+
+# Clean up 
+clean
+
+# Final statistics
+stat -liberty /home/mudit/.volare/sky130A/libs.ref/sky130_fd_sc_hd/lib/sky130_fd_sc_hd__tt_025C_1v80.lib
+
+# Write synthesized netlist
+write_verilog simple_arm_sky130.v
+
+# Write JSON for analysis
+write_json simple_arm_sky130.json

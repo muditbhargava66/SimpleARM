@@ -1,0 +1,25 @@
+{
+    "DESIGN_NAME": "simple_arm_top",
+    "VERILOG_FILES": [
+        "dir::rtl/core/*.v",
+        "dir::rtl/memory/*.v",
+        "dir::rtl/debug/*.v",
+        "dir::rtl/top/*.v"
+    ],
+    "CLOCK_PORT": "clk",
+    "CLOCK_PERIOD": 10.0,
+    "SDC_FILE": "dir::synthesis/constraints/timing.sdc",
+    "FP_CORE_UTIL": 50,
+    "PL_TARGET_DENSITY_PCT": 40,
+    "FP_SIZING": "absolute",
+    "DIE_AREA": "0 0 1500 1500",
+    "FP_PDN_CORE_RING": true,
+    "RUN_CTS": true,
+    "RUN_HEURISTIC_DIODE_INSERTION": true,
+    "DIODE_ON_PORTS": "in",
+    "MAGIC_EXT_USE_GDS": false,
+    "RUN_MAGIC_DRC": true,
+    "RUN_LVS": false,
+    "SYNTH_STRATEGY": "AREA 0",
+    "ERROR_ON_SYNTH_CHECKS": false
+}

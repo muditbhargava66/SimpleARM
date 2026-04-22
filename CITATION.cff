@@ -1,0 +1,18 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+authors:
+- family-names: "Bhargava"
+  given-names: "Mudit"
+title: "SimpleARM: Open-Source ARM Cortex-M0 Compatible Processor Core"
+version: 1.0.0
+date-released: 2026-04-22
+url: "https://github.com/muditbhargava66/SimpleARM"
+keywords:
+  - risc
+  - arm
+  - cortex-m0
+  - sky130
+  - open-source-hardware
+  - verilog
+  - hardware-description-language
+license: MIT

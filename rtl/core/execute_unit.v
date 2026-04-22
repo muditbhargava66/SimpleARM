@@ -134,7 +134,7 @@ module execute_unit (
     end
 
     // Assertions for verification
-    // synthesis translate_off
+`ifndef SYNTHESIS
     always @(posedge clk) begin
         if (valid_in) begin
             // Check ALU operation validity
@@ -151,6 +151,6 @@ module execute_unit (
                 $error("Simultaneous memory read and write");
         end
     end
-    // synthesis translate_on
+`endif
 
 endmodule

@@ -1,0 +1,30 @@
+{
+  "DESIGN_NAME": "tt_um_simple_arm",
+  "VERILOG_FILES": [
+    "dir::project.v",
+    "dir::../rtl/top/simple_arm_top.v",
+    "dir::../rtl/core/alu.v",
+    "dir::../rtl/core/decode_unit.v",
+    "dir::../rtl/core/execute_unit.v",
+    "dir::../rtl/core/fetch_unit.v",
+    "dir::../rtl/core/register_file.v",
+    "dir::../rtl/memory/memory_controller.v",
+    "dir::../rtl/memory/sram_wrapper.v",
+    "dir::../rtl/debug/jtag_controller.v"
+  ],
+  "CLOCK_PORT": "clk",
+  "CLOCK_PERIOD": 10.0,
+  "FP_SIZING": "absolute",
+  "DIE_AREA": "0 0 161.00 111.52",
+  "PL_TARGET_DENSITY": 0.45,
+  "FP_PDN_CORE_RING": true,
+  "RUN_CTS": true,
+  "SYNTH_STRATEGY": "AREA 0",
+  "MAGIC_GENERATE_GDS": true,
+  "MAGIC_GENERATE_LEF": true,
+  "MAGIC_GENERATE_MAG": true,
+  "FP_DEF_TEMPLATE": "dir::../tt/tech/sky130A/def/tt_block_1x1_pg.def",
+  "VDD_PIN": "VPWR",
+  "GND_PIN": "VGND",
+  "RT_MAX_LAYER": "met4"
+}

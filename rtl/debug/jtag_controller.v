@@ -153,7 +153,7 @@ module jtag_controller (
         next_dr = dr;
         if (tap_state == CAPTURE_DR) begin
             case (ir)
-                IDCODE: next_dr = 32'h0A57_E5E5; // Simple ID code
+                IDCODE: next_dr = {8'h00, 32'h0A57_E5E5}; // Simple ID code with padding
                 REG_ACCESS: next_dr = {dbg_reg_rdata, 8'h0};
                 MEM_ACCESS: next_dr = {dbg_mem_rdata, 8'h0};
                 CTRL_ACCESS: next_dr = {ctrl_reg, 8'h0};
@@ -161,6 +161,14 @@ module jtag_controller (
             endcase
         end else if (tap_state == SHIFT_DR) begin
             next_dr = {tdi, dr[39:1]};
+        end
+    end
+
+    // Control register update logic
+    always @(*) begin
+        next_ctrl_reg = ctrl_reg;  // Default: hold current value
+        if (tap_state == UPDATE_DR && ir == CTRL_ACCESS) begin
+            next_ctrl_reg = dr[39:8];  // Update from data register
         end
     end
 
@@ -205,8 +213,8 @@ module jtag_controller (
                 end
                 
                 CTRL_ACCESS: begin
-                    dbg_reset_n = ~dr[0];
-                    dbg_halt_req = dr[1];
+                    dbg_reset_n = ~dr[8];
+                    dbg_halt_req = dr[9];
                 end
                 
                 default: begin

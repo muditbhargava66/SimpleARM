@@ -1,0 +1,42 @@
+# -----------------------------------------------------------------------------
+# File: run_synth.ys
+# Project: SimpleARM - A Simplified ARM Cortex-M0 Processor Core
+# Purpose: Yosys synthesis script
+# Usage: cd /home/mudit/Projects/SimpleARM && yosys scripts/run_synth.ys
+# -----------------------------------------------------------------------------
+
+# Read RTL files
+read_verilog rtl/core/fetch_unit.v
+read_verilog rtl/core/decode_unit.v
+read_verilog rtl/core/execute_unit.v
+read_verilog rtl/core/register_file.v
+read_verilog rtl/core/alu.v
+read_verilog rtl/memory/memory_controller.v
+read_verilog rtl/memory/sram_wrapper.v
+read_verilog rtl/debug/jtag_controller.v
+read_verilog rtl/top/simple_arm_top.v
+
+# Create a blackbox for SRAM (OpenRAM macro placeholder)
+# We'll read this inline
+read_verilog -defer scripts/sram_blackbox.v
+
+# Set top module and check hierarchy
+hierarchy -check -top simple_arm_top
+
+# Generic synthesis passes
+proc
+opt
+memory
+opt
+
+# Perform synthesis
+synth -top simple_arm_top
+
+# Check design for issues
+check
+
+# Generate area statistics
+stat
+
+# Write JSON for analysis
+write_json synthesis_result.json

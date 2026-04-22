@@ -1,3 +1,5 @@
+<div align="center">
+
 # SimpleARM: Open-Source ARM Cortex-M0 Compatible Processor Core
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
@@ -9,16 +11,18 @@ A fully open-source, silicon-proven ARM Cortex-M0 compatible processor core impl
 
 ![SimpleARM Architecture](docs/images/project-icon.svg)
 
+</div>
+
 ## Key Features
 
-- 📚 32-bit RISC architecture (ARMv6-M instruction set subset)
-- 🔄 3-stage pipeline (Fetch, Decode, Execute)
-- 💾 8KB OpenRAM-based SRAM (4KB instruction + 4KB data)
-- 🔌 JTAG debug interface
-- ⚡ 100MHz target frequency
-- 🛠️ Complete synthesis and P&R flow using open-source tools
-- 📊 Comprehensive verification suite
-- 📝 Detailed documentation
+- 32-bit RISC architecture (ARMv6-M instruction set subset)
+- 3-stage pipeline (Fetch, Decode, Execute)
+- 8KB OpenRAM-based SRAM (4KB instruction + 4KB data)
+- JTAG debug interface
+- 100MHz target frequency
+- Complete synthesis and P&R flow using open-source tools
+- Comprehensive verification suite
+- Detailed documentation
 
 ## Architecture Overview
 <div align="center">
@@ -35,22 +39,25 @@ A fully open-source, silicon-proven ARM Cortex-M0 compatible processor core impl
 ```bash
 # Clone the repository
 git clone https://github.com/muditbhargava66/SimpleARM.git
-cd simple-arm
+cd SimpleARM
 
-# Install dependencies
-./tools/scripts/setup_env.sh
+# Install dependencies and setup environment
+# Follow instructions in docs/INSTALL.md
 
-# Generate SRAM
-python tools/scripts/generate_sram.py
+# Run RTL simulation (Verilator)
+make sim
 
-# Run synthesis
+# Run Cocotb tests
+make test
+
+# Run formal verification
+make formal
+
+# Run synthesis (Sky130)
 make synth
 
-# Run place and route
-make pnr
-
-# Run tests
-make test
+# Run physical implementation (OpenLane)
+make harden
 ```
 
 ## Documentation
@@ -66,14 +73,14 @@ make test
 ## Directory Structure
 
 ```
-simple-arm/
+SimpleARM/
 ├── rtl/                    # RTL source files
 │   ├── core/              # CPU core components
 │   ├── memory/            # Memory subsystem
 │   ├── debug/             # Debug interface
 │   └── top/               # Top-level integration
 ├── synthesis/             # Synthesis files
-├── pnr/                   # Place and route files
+├── tt/                    # TinyTapeout support tools
 ├── verification/          # Verification environment
 ├── tools/                 # Utility scripts
 └── docs/                  # Documentation
@@ -109,37 +116,45 @@ simple-arm/
    make synth
    ```
 
-4. **Run Place and Route**
+4. **Run Hardening (OpenLane)**
    ```bash
-   make pnr
+   make harden
    ```
 
-5. **Generate Final GDS**
-   ```bash
-   make gds
-   ```
+## Physical Design Results (Sky130)
+
+Preliminary results from the OpenLane hardening flow:
+
+| Metric                   | Value   |
+|--------------------------|---------|
+| Total Cells              | 26,030  |
+| Flip-Flops               | 8,224   |
+| Target Frequency         | 100 MHz |
+| Tile Count (TT)          | 8x2     |
 
 ## Verification
 
-1. **Run Unit Tests**
-   ```bash
-   make unit_test
-   ```
+### Verilator Simulation
+The primary RTL simulation is performed using Verilator. Run with:
+```bash
+make sim
+```
 
-2. **Run Integration Tests**
-   ```bash
-   make integration_test
-   ```
+### Cocotb Verification
+Cocotb-based verification environment for functional checks:
+```bash
+make test
+```
 
-3. **Run Full Regression**
-   ```bash
-   make regression
-   ```
+### Formal Verification
+Bounded Model Checking (BMC) is supported via SymbiYosys:
+```bash
+make formal
+```
 
-4. **Generate Coverage Report**
-   ```bash
-   make coverage
-   ```
+## Submodules
+This project uses the following submodules:
+- `tt`: TinyTapeout support tools for hardening and GDS generation.
 
 ## Contributing
 
@@ -153,22 +168,11 @@ We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) f
 
 ## Performance
 
-| Metric | Value |
-|--------|-------|
-| Max Frequency | 100 MHz |
-| Core Area | 0.5 mm² |
-| Power Consumption | 5 mW typ. |
-| DMIPS/MHz | 0.84 |
-| Memory Size | 8 KB |
-
-## Applications
-
-- Embedded Systems
-- IoT Devices
-- Microcontrollers
-- Educational Platforms
-- RISC Research
-- Open-Source Silicon
+| Metric               | Value   |
+|----------------------|---------|
+| Max Frequency        | 100 MHz |
+| DMIPS/MHz            | 0.84    |
+| Memory Size          | 8 KB    |
 
 ## Tools Integration
 
@@ -178,6 +182,38 @@ We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) f
 - Memory Generation: OpenRAM
 - DRC/LVS: Magic/Netgen
 - GDS Viewer: KLayout
+
+## Citation
+
+If you use SimpleARM in your research, please cite:
+
+```bibtex
+@misc{simple_arm_2026,
+  author = {Mudit Bhargava},
+  title = {SimpleARM: Open-Source ARM Cortex-M0 Compatible Processor Core},
+  year = {2026},
+  publisher = {GitHub},
+  url = {https://github.com/muditbhargava66/SimpleARM.git}
+}
+```
+
+## Project Status
+
+- [x] RTL Development: Complete
+- [x] Memory Integration: Complete
+- [x] Basic Verification: Complete
+- [ ] FPGA Prototype: In Progress
+- [ ] Advanced Features: In Progress
+- [ ] Tape-out Ready: In Progress
+
+## Future Roadmap
+
+- **M-Extension**: Implement Multiplication and Division hardware logic.
+- **Forwarding**: Add data forwarding from Execute/Memory to Decode to reduce pipeline stalls.
+- **Branch Prediction**: Replace static prediction with a dynamic 2-bit saturating counter.
+- **Debug Interface**: Enhance JTAG controller with hardware breakpoints and run-control.
+- **Memory System**: Implement a 2-way set associative instruction cache (4KB).
+- **Bus Support**: Multi-master bus arbitration for peripheral integration.
 
 ## License
 
@@ -191,62 +227,9 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - OpenRAM team
 - Open-source EDA community
 
-## Citation
-
-If you use SimpleARM in your research, please cite:
-
-```bibtex
-@misc{simple_arm_2024,
-  author = {Your Name},
-  title = {SimpleARM: Open-Source ARM Cortex-M0 Compatible Processor Core},
-  year = {2024},
-  publisher = {GitHub},
-  url = {https://github.com/muditbhargava66/SimpleARM.git}
-}
-```
-
-## Support
-
-- 📖 [Documentation Wiki](https://github.com/muditbhargava66/SimpleARM/wiki)
-- 💬 [Discussion Forum](https://github.com/muditbhargava66/SimpleARM/discussions)
-- 🐛 [Issue Tracker](https://github.com/muditbhargava66/SimpleARM/issues)
-
-## Project Status
-
-- ✅ RTL Development: Complete
-- ✅ Memory Integration: Complete
-- ✅ Basic Verification: Complete
-- ✅ FPGA Prototype: Complete
-- 🟡 Advanced Features: In Progress
-- 🟡 Tape-out Ready: In Progress
-
-## Roadmap
-
-- Advanced debug features
-- Extended instruction set
-- Power optimization
-- Additional peripherals
-- FPGA development board
-- Educational resources
-
-## Related Projects
+### Related Projects
 
 - [OpenRAM](https://github.com/VLSIDA/OpenRAM)
 - [OpenROAD](https://github.com/The-OpenROAD-Project/OpenROAD)
 - [SkyWater PDK](https://github.com/google/skywater-pdk)
 - [Yosys](https://github.com/YosysHQ/yosys)
-
-## Contact
-
-For any questions or inquiries, please contact the project maintainer:
-
-- Name: Mudit Bhargava
-- GitHub: [@muditbhargava66](https://github.com/muditbhargava66)
-
----
-
-<div align="center">
-Made with ❤️ by the SimpleARM Team
-</div>
-
----
